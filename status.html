@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登記狀態查詢 - 文成公主國際基金會</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+            padding: 1rem 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .status-container {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .status-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-header h1 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-header p {
+            color: #9ca3af;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .status-badge.pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-badge.confirmed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-badge.cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-badge.completed {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: rgba(55, 65, 81, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #ef4444;
+        }
+
+        .info-card h3 {
+            color: #ef4444;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Event Poster */
+        .event-poster {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .event-poster img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Actions */
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(75, 85, 99, 0.3);
+            color: white;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(31, 41, 55, 0.95);
+            border-top: 1px solid rgba(75, 85, 99, 0.3);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .footer-logo-text {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .footer-copyright {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+                line-height: 1.4;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .header {
+                background: white !important;
+                border-bottom: 2px solid #333 !important;
+                padding: 1rem 0 !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .logo-icon {
+                background: #333 !important;
+                color: white !important;
+            }
+            
+            .logo-text {
+                color: #333 !important;
+            }
+            
+            .main-content {
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .status-container {
+                background: white !important;
+                border: 1px solid #333 !important;
+                border-radius: 0 !important;
+                padding: 1rem !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+            
+            .status-header {
+                text-align: center !important;
+                margin-bottom: 1rem !important;
+                border-bottom: 1px solid #333 !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            .status-header h1 {
+                color: #333 !important;
+                font-size: 18pt !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .status-header p {
+                color: #666 !important;
+                font-size: 10pt !important;
+            }
+            
+            .status-badge {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+                border: 1px solid #333 !important;
+                font-size: 10pt !important;
+                padding: 0.3rem 0.8rem !important;
+                margin: 0 auto 1rem !important;
+                display: block !important;
+                width: fit-content !important;
+            }
+            
+            .event-poster {
+                text-align: center !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .event-poster img {
+                max-width: 200px !important;
+                height: auto !important;
+                border: 1px solid #333 !important;
+            }
+            
+            .info-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .info-card {
+                background: white !important;
+                border: 1px solid #333 !important;
+                border-radius: 0 !important;
+                padding: 0.8rem !important;
+                border-left: 4px solid #333 !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .info-card h3 {
+                color: #333 !important;
+                font-size: 12pt !important;
+                margin-bottom: 0.5rem !important;
+                border-bottom: 1px solid #333 !important;
+                padding-bottom: 0.3rem !important;
+            }
+            
+            .info-item {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0.2rem 0 !important;
+                border-bottom: 1px solid #ddd !important;
+                font-size: 10pt !important;
+            }
+            
+            .info-item:last-child {
+                border-bottom: none !important;
+            }
+            
+            .info-label {
+                color: #666 !important;
+                font-weight: normal !important;
+            }
+            
+            .info-value {
+                color: #333 !important;
+                font-weight: bold !important;
+            }
+            
+            .actions {
+                display: none !important;
+            }
+            
+            .footer {
+                display: none !important;
+            }
+            
+            /* 確保內容適合 A4 頁面 */
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+            
+            /* 避免分頁 */
+            .status-container {
+                page-break-inside: avoid !important;
+            }
+            
+            .info-grid {
+                page-break-inside: avoid !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            .footer-container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">文</div>
+                <div class="logo-text">文成公主國際基金會</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="status-container">
+            <div class="status-header">
+                <h1>登記狀態查詢</h1>
+                <p>查看您的預購登記詳情和狀態</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading">
+                <p>正在載入登記資料...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error" style="display: none;">
+                <p id="errorMessage">載入失敗</p>
+            </div>
+
+            <!-- Success State -->
+            <div id="successState" style="display: none;">
+                <!-- Status Badge -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <div class="status-badge" id="statusBadge">
+                        載入中...
+                    </div>
+                </div>
+
+                <!-- Event Poster -->
+                <div class="event-poster" id="eventPoster">
+                    <!-- Event poster will be loaded here -->
+                </div>
+
+                <!-- Info Grid -->
+                <div class="info-grid">
+                    <!-- Event Information -->
+                    <div class="info-card">
+                        <h3>活動資訊</h3>
+                        <div class="info-item">
+                            <span class="info-label">活動名稱</span>
+                            <span class="info-value" id="eventTitle">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">活動日期</span>
+                            <span class="info-value" id="eventDate">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">活動時間</span>
+                            <span class="info-value" id="eventTime">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">活動地點</span>
+                            <span class="info-value" id="eventVenue">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Information -->
+                    <div class="info-card">
+                        <h3>票券資訊</h3>
+                        <div class="info-item">
+                            <span class="info-label">票券類型</span>
+                            <span class="info-value" id="ticketName">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">票券價格</span>
+                            <span class="info-value" id="ticketPrice">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">購買數量</span>
+                            <span class="info-value" id="ticketQuantity">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">總金額</span>
+                            <span class="info-value" id="totalAmount">-</span>
+                        </div>
+                    </div>
+
+                    <!-- User Information -->
+                    <div class="info-card">
+                        <h3>用戶資訊</h3>
+                        <div class="info-item">
+                            <span class="info-label">姓名</span>
+                            <span class="info-value" id="userName">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">電子郵件</span>
+                            <span class="info-value" id="userEmail">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">聯絡方式</span>
+                            <span class="info-value" id="contactMethod">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">聯絡資訊</span>
+                            <span class="info-value" id="contactInfo">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Information -->
+                    <div class="info-card">
+                        <h3>登記資訊</h3>
+                        <div class="info-item">
+                            <span class="info-label">登記時間</span>
+                            <span class="info-value" id="purchaseDate">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">登記狀態</span>
+                            <span class="info-value" id="purchaseStatus">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">確認狀態</span>
+                            <span class="info-value" id="confirmationStatus">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">登記編號</span>
+                            <span class="info-value" id="purchaseId">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <a href="/" class="btn">返回首頁</a>
+                    <a href="#" class="btn btn-secondary" onclick="window.print()">列印登記資料</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <div class="footer-logo-icon">文</div>
+                <div class="footer-logo-text">文成公主國際基金會</div>
+            </div>
+            <p class="footer-copyright">© 2024 文成公主國際基金會. 版權所有.</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        // 頁面載入時獲取 uniqueId 並載入資料
+        document.addEventListener('DOMContentLoaded', () => {
+            const pathParts = window.location.pathname.split('/');
+            const uniqueId = pathParts[pathParts.length - 1];
+            
+            if (uniqueId && uniqueId !== 'status') {
+                loadPurchaseData(uniqueId);
+            } else {
+                showError('無效的登記編號');
+            }
+        });
+
+        // 載入購買資料
+        async function loadPurchaseData(uniqueId) {
+            try {
+                const response = await fetch(`${API_BASE}/purchases/status/${uniqueId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayPurchaseData(data.data);
+                } else {
+                    showError(data.message || '找不到登記記錄');
+                }
+            } catch (error) {
+                console.error('載入登記資料失敗:', error);
+                showError('載入登記資料失敗，請稍後再試');
+            }
+        }
+
+        // 顯示購買資料
+        function displayPurchaseData(purchase) {
+            // 隱藏載入狀態
+            document.getElementById('loadingState').style.display = 'none';
+            
+            // 顯示成功狀態
+            document.getElementById('successState').style.display = 'block';
+
+            // 更新狀態標籤
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.textContent = getStatusText(purchase.status);
+            statusBadge.className = `status-badge ${purchase.status}`;
+
+            // 更新活動資訊
+            if (purchase.event) {
+                document.getElementById('eventTitle').textContent = purchase.event.title;
+                document.getElementById('eventDate').textContent = new Date(purchase.event.date).toLocaleDateString('zh-TW');
+                document.getElementById('eventTime').textContent = purchase.event.time;
+                document.getElementById('eventVenue').textContent = purchase.event.venue;
+
+                // 顯示活動海報
+                if (purchase.event.image) {
+                    document.getElementById('eventPoster').innerHTML = `
+                        <img src="${purchase.event.image}" alt="${purchase.event.title}" 
+                             onerror="this.src='https://via.placeholder.com/300x400/1f2937/ffffff?text=Event+Poster'">
+                    `;
+                }
+            }
+
+            // 更新票券資訊
+            if (purchase.ticket) {
+                document.getElementById('ticketName').textContent = purchase.ticket.name;
+                document.getElementById('ticketPrice').textContent = `HK$${purchase.ticket.price}/每場`;
+                document.getElementById('ticketQuantity').textContent = purchase.quantity;
+                document.getElementById('totalAmount').textContent = `HK$${purchase.totalPrice || purchase.totalAmount || 0}`;
+            }
+
+            // 更新用戶資訊
+            document.getElementById('userName').textContent = purchase.username;
+            document.getElementById('userEmail').textContent = purchase.email;
+            document.getElementById('contactMethod').textContent = getContactMethodText(purchase.contactMethod);
+            document.getElementById('contactInfo').textContent = purchase.contactInfo;
+
+            // 更新登記資訊
+            document.getElementById('purchaseDate').textContent = new Date(purchase.createdAt).toLocaleString('zh-TW');
+            document.getElementById('purchaseStatus').textContent = getStatusText(purchase.status);
+            document.getElementById('confirmationStatus').textContent = purchase.confirmationSent ? '已發送' : '未發送';
+            // 顯示登記編號（只顯示前8位和後8位）
+            const uniqueId = purchase.uniqueId;
+            const shortId = uniqueId ? `${uniqueId.substring(0, 8)}...${uniqueId.substring(uniqueId.length - 8)}` : 'N/A';
+            document.getElementById('purchaseId').textContent = shortId;
+        }
+
+        // 顯示錯誤
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // 輔助函數
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待付款',
+                'confirmed': '已付款',
+                'cancelled': '已取消',
+                'completed': '已完成'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getContactMethodText(method) {
+            const methodMap = {
+                'whatsapp': 'WhatsApp',
+                'email': '電子郵件',
+                'phone': '電話'
+            };
+            return methodMap[method] || method;
+        }
+    </script>
+</body>
+</html>

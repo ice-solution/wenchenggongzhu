@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶後台 - 文成公主國際基金會</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net@1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+            padding: 1rem 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(75, 85, 99, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Login Form */
+        .login-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .login-form h2 {
+            color: #ef4444;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        .btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #9ca3af;
+        }
+
+        /* Event Selection */
+        .event-selection {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .event-selection h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .event-card {
+            background: rgba(55, 65, 81, 0.2);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            border-color: #ef4444;
+            transform: translateY(-2px);
+        }
+
+        .event-card.selected {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .event-card h3 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-card p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* Charts and Tables */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .chart-container h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Data Table */
+        .table-section {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .table-section h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        /* Status Management */
+        .status-management {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .status-management h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .status-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .status-btn.pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-btn.confirmed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-btn.cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .event-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">文</div>
+                <div class="logo-text">文成公主國際基金會</div>
+            </div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">用戶</span>
+                <button class="logout-btn" onclick="logout()">登出</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Login Form -->
+        <div class="login-container" id="loginContainer">
+            <form class="login-form" id="loginForm">
+                <h2>用戶登入</h2>
+                <div class="form-group">
+                    <label for="email">電子郵件</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密碼</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn" id="loginBtn">登入</button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <h1>用戶後台</h1>
+                <p>查看您的登記詳情和統計數據</p>
+            </div>
+
+            <!-- Event Selection -->
+            <div class="event-selection">
+                <h2>選擇活動</h2>
+                <div class="event-cards" id="eventCards">
+                    <!-- Event cards will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be loaded here -->
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h3>每日登記趨勢</h3>
+                    <div class="chart-canvas">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>票券銷售分布</h3>
+                    <div class="chart-canvas">
+                        <canvas id="ticketChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Management -->
+            <div class="status-management">
+                <h3>付款狀態管理</h3>
+                <div class="status-buttons">
+                    <button class="status-btn pending" onclick="filterByStatus('pending')">待付款</button>
+                    <button class="status-btn confirmed" onclick="filterByStatus('confirmed')">已付款</button>
+                    <button class="status-btn cancelled" onclick="filterByStatus('cancelled')">已取消</button>
+                    <button class="status-btn" onclick="filterByStatus('')" style="background: rgba(75, 85, 99, 0.3); color: white; border: 1px solid rgba(75, 85, 99, 0.5);">全部</button>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-section">
+                <h3>購買記錄詳情</h3>
+                <table id="purchasesTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>購買時間</th>
+                            <th>活動</th>
+                            <th>票券</th>
+                            <th>數量</th>
+                            <th>金額</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        let currentUser = null;
+        let currentEventId = null;
+        let purchasesData = [];
+        let dailyChart = null;
+        let ticketChart = null;
+        let purchasesTable = null;
+
+        // 頁面載入時檢查登入狀態
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                checkAuthStatus();
+            }
+        });
+
+        // 檢查認證狀態
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/users/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.data;
+                    showDashboard();
+                    loadEvents();
+                } else {
+                    localStorage.removeItem('token');
+                    showLogin();
+                }
+            } catch (error) {
+                console.error('認證檢查失敗:', error);
+                localStorage.removeItem('token');
+                showLogin();
+            }
+        }
+
+        // 顯示登入表單
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+
+        // 顯示後台
+        function showDashboard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'flex';
+            
+            // 更新用戶資訊
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+        }
+
+        // 登入處理
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登入中...';
+
+            try {
+                const response = await fetch(`${API_BASE}/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.data.token);
+                    currentUser = data.data.user;
+                    showDashboard();
+                    loadEvents();
+                } else {
+                    showError(data.message || '登入失敗');
+                }
+            } catch (error) {
+                console.error('登入錯誤:', error);
+                showError('登入失敗，請稍後再試');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登入';
+            }
+        });
+
+        // 登出
+        function logout() {
+            localStorage.removeItem('token');
+            currentUser = null;
+            showLogin();
+        }
+
+        // 載入活動列表
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_BASE}/events`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const eventCards = document.getElementById('eventCards');
+                    eventCards.innerHTML = '';
+
+                    data.data.slice(0, 3).forEach(event => {
+                        const card = document.createElement('div');
+                        card.className = 'event-card';
+                        card.onclick = () => selectEvent(event._id, card);
+                        card.innerHTML = `
+                            <h3>${event.title}</h3>
+                            <p>${event.shortDescription || event.description}</p>
+                        `;
+                        eventCards.appendChild(card);
+                    });
+                }
+            } catch (error) {
+                console.error('載入活動失敗:', error);
+                showError('載入活動失敗');
+            }
+        }
+
+        // 選擇活動
+        function selectEvent(eventId, cardElement) {
+            // 移除其他選中狀態
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 選中當前卡片
+            cardElement.classList.add('selected');
+            currentEventId = eventId;
+            
+            // 載入活動數據
+            loadEventData();
+        }
+
+        // 載入活動數據
+        async function loadEventData() {
+            if (!currentEventId) return;
+
+            try {
+                // 載入統計數據
+                const statsResponse = await fetch(`${API_BASE}/users/stats?eventId=${currentEventId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    updateStats(statsData.data);
+                    updateCharts(statsData.data);
+                }
+
+                // 載入購買記錄
+                const purchasesResponse = await fetch(`${API_BASE}/users/purchases?eventId=${currentEventId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (purchasesResponse.ok) {
+                    const purchasesData = await purchasesResponse.json();
+                    updateTable(purchasesData.data);
+                }
+
+            } catch (error) {
+                console.error('載入活動數據失敗:', error);
+                showError('載入活動數據失敗');
+            }
+        }
+
+        // 更新統計卡片
+        function updateStats(data) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${data.summary.totalPurchases}</div>
+                    <div class="stat-label">總購買記錄</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">HK$${data.summary.totalAmount}</div>
+                    <div class="stat-label">總金額</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.summary.pendingPurchases}</div>
+                    <div class="stat-label">待付款</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${data.summary.confirmedPurchases}</div>
+                    <div class="stat-label">已付款</div>
+                </div>
+            `;
+        }
+
+        // 更新圖表
+        function updateCharts(data) {
+            // 每日登記趨勢圖
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            if (dailyChart) dailyChart.destroy();
+            
+            dailyChart = new Chart(dailyCtx, {
+                type: 'line',
+                data: {
+                    labels: data.dailyStats.map(stat => stat.date),
+                    datasets: [{
+                        label: '每日登記數量',
+                        data: data.dailyStats.map(stat => stat.count),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(75, 85, 99, 0.3)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(75, 85, 99, 0.3)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 票券銷售分布圖
+            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
+            if (ticketChart) ticketChart.destroy();
+            
+            ticketChart = new Chart(ticketCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.ticketStats.map(stat => stat.name),
+                    datasets: [{
+                        data: data.ticketStats.map(stat => stat.count),
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#eab308',
+                            '#22c55e',
+                            '#06b6d4',
+                            '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新數據表格
+        function updateTable(data) {
+            purchasesData = data;
+            
+            if (purchasesTable) {
+                purchasesTable.destroy();
+            }
+
+            const tableData = data.map(purchase => [
+                new Date(purchase.createdAt).toLocaleString('zh-TW'),
+                purchase.event ? purchase.event.title : 'N/A',
+                purchase.ticket ? purchase.ticket.name : 'N/A',
+                purchase.quantity,
+                `HK$${purchase.totalAmount}`,
+                getStatusText(purchase.status),
+                `<button class="status-btn ${purchase.status}" onclick="updatePurchaseStatus('${purchase._id}', '${purchase.status}')">更新狀態</button>`
+            ]);
+
+            purchasesTable = $('#purchasesTable').DataTable({
+                data: tableData,
+                pageLength: 10,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/zh-HANT.json'
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        }
+
+        // 按狀態篩選
+        function filterByStatus(status) {
+            if (!purchasesTable) return;
+            
+            if (status) {
+                purchasesTable.column(5).search(getStatusText(status)).draw();
+            } else {
+                purchasesTable.column(5).search('').draw();
+            }
+        }
+
+        // 更新購買狀態
+        async function updatePurchaseStatus(purchaseId, currentStatus) {
+            const newStatus = prompt('請輸入新狀態 (pending/confirmed/cancelled):', currentStatus);
+            
+            if (!newStatus || !['pending', 'confirmed', 'cancelled'].includes(newStatus)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/purchases/${purchaseId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('狀態更新成功');
+                    loadEventData(); // 重新載入數據
+                } else {
+                    showError(data.message || '狀態更新失敗');
+                }
+            } catch (error) {
+                console.error('更新狀態失敗:', error);
+                showError('狀態更新失敗');
+            }
+        }
+
+        // 輔助函數
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待付款',
+                'confirmed': '已付款',
+                'cancelled': '已取消',
+                'completed': '已完成'
+            };
+            return statusMap[status] || status;
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.main-content').insertBefore(errorDiv, document.querySelector('.main-content').firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.querySelector('.main-content').insertBefore(successDiv, document.querySelector('.main-content').firstChild);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

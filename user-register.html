@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶註冊 - 文成公主國際基金會</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            margin: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .header h1 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #9ca3af;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-hint {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        .btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(75, 85, 99, 0.3);
+            color: white;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: #ef4444;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">文</div>
+                <div class="logo-text">文成公主國際基金會</div>
+            </div>
+            <h1>用戶註冊</h1>
+            <p>創建您的帳戶以訪問後台系統</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">電子郵件 *</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    placeholder="請輸入您的電子郵件地址"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="username">姓名 *</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="請輸入您的姓名"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">密碼 *</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="請輸入密碼（至少6位）"
+                    minlength="6"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">確認密碼 *</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    required 
+                    placeholder="請再次輸入密碼"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="contactMethod">聯絡方式 *</label>
+                <select id="contactMethod" name="contactMethod" required>
+                    <option value="">請選擇聯絡方式</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">電子郵件</option>
+                    <option value="phone">電話</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="contactInfo">聯絡資訊 *</label>
+                <input 
+                    type="text" 
+                    id="contactInfo" 
+                    name="contactInfo" 
+                    required 
+                    placeholder="請輸入聯絡資訊"
+                >
+                <div class="form-hint" id="contactHint">
+                    請根據您選擇的聯絡方式輸入相應資訊
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="registerBtn">註冊</button>
+        </form>
+
+        <div class="login-link">
+            <p>已有帳戶？ <a href="/user-dashboard">立即登入</a></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        // 聯絡方式變更事件
+        const contactMethodSelect = document.getElementById('contactMethod');
+        const contactInfoInput = document.getElementById('contactInfo');
+        const contactHint = document.getElementById('contactHint');
+
+        contactMethodSelect.addEventListener('change', (e) => {
+            const method = e.target.value;
+            contactInfoInput.placeholder = getContactPlaceholder(method);
+            contactHint.textContent = getContactHint(method);
+        });
+
+        // 表單提交事件
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+
+            // 驗證密碼確認
+            if (password !== confirmPassword) {
+                showError('密碼確認不匹配');
+                return;
+            }
+
+            const registerData = {
+                email: formData.get('email'),
+                username: formData.get('username'),
+                password: password,
+                contactMethod: formData.get('contactMethod'),
+                contactInfo: formData.get('contactInfo')
+            };
+
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = '註冊中...';
+
+            try {
+                const response = await fetch(`${API_BASE}/users/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(registerData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('註冊成功！正在跳轉到登入頁面...');
+                    setTimeout(() => {
+                        window.location.href = '/user-dashboard';
+                    }, 2000);
+                } else {
+                    showError(data.message || '註冊失敗');
+                }
+            } catch (error) {
+                console.error('註冊錯誤:', error);
+                showError('註冊失敗，請稍後再試');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = '註冊';
+            }
+        });
+
+        // 輔助函數
+        function getContactPlaceholder(method) {
+            switch (method) {
+                case 'whatsapp':
+                    return '例如：+85212345678';
+                case 'phone':
+                    return '例如：+85212345678';
+                case 'email':
+                    return '例如：user@example.com';
+                default:
+                    return '請輸入聯絡資訊';
+            }
+        }
+
+        function getContactHint(method) {
+            switch (method) {
+                case 'whatsapp':
+                    return '請輸入 WhatsApp 號碼，以 + 開頭，例如：+85212345678';
+                case 'phone':
+                    return '請輸入電話號碼，以 + 開頭，例如：+85212345678';
+                case 'email':
+                    return '請輸入電子郵件地址，例如：user@example.com';
+                default:
+                    return '請根據您選擇的聯絡方式輸入相應資訊';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.querySelector('.register-container').insertBefore(errorDiv, document.querySelector('#registerForm'));
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.querySelector('.register-container').insertBefore(successDiv, document.querySelector('#registerForm'));
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+{
+  "name": "makealive-ticketing-platform",
+  "version": "1.0.0",
+  "description": "A ticketing platform for events and concerts",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server.js",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^7.0.6",
+    "path": "^0.12.7",
+    "sharp": "^0.34.4",
+    "stripe": "^14.25.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "ticketing",
+    "events",
+    "concerts",
+    "mongodb",
+    "express"
+  ],
+  "author": "MakeALive",
+  "license": "MIT"
+}

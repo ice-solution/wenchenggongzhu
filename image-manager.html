@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖片管理 - 文成公主國際基金會</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-section {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #ef4444;
+        }
+        
+        .upload-section.dragover {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-danger {
+            background: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .image-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .image-info {
+            padding: 1rem;
+        }
+        
+        .image-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+        }
+        
+        .image-url {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+        
+        .image-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ef4444;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>圖片管理 - 文成公主國際基金會</h1>
+    </div>
+    
+    <div class="container">
+        <a href="admin.html" class="back-link">← 返回活動管理</a>
+        
+        <!-- 上傳區域 -->
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; color: #1f2937;">上傳圖片</h2>
+            
+            <div id="alert-container"></div>
+            
+            <div class="upload-section" id="uploadSection">
+                <div style="margin-bottom: 1rem;">
+                    <svg width="48" height="48" fill="#9ca3af" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                </div>
+                <p style="margin-bottom: 1rem; color: #6b7280;">拖拽圖片到這裡或點擊選擇檔案</p>
+                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">選擇圖片</button>
+                <p style="margin-top: 1rem; font-size: 0.875rem; color: #9ca3af;">支援 JPG, PNG, GIF, WebP 格式，單個檔案最大 5MB</p>
+            </div>
+            
+            <div class="loading" id="uploadLoading">
+                <div class="spinner"></div>
+                <p>上傳中...</p>
+            </div>
+        </div>
+        
+        <!-- 圖片列表 -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: #1f2937;">已上傳的圖片</h2>
+                <button class="btn btn-small" onclick="loadImages()">重新整理</button>
+            </div>
+            
+            <div id="imagesList" class="images-grid">
+                <p>載入中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        
+        // 顯示提示訊息
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alert-container');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            alertContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 顯示/隱藏載入狀態
+        function toggleUploadLoading(show) {
+            document.getElementById('uploadLoading').style.display = show ? 'block' : 'none';
+        }
+        
+        // 檔案上傳
+        async function uploadFiles(files) {
+            if (files.length === 0) return;
+            
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append('images', file);
+            });
+            
+            toggleUploadLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload/images`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const totalOriginal = result.data.reduce((sum, file) => sum + file.originalSize, 0);
+                    const totalCompressed = result.data.reduce((sum, file) => sum + file.compressedSize, 0);
+                    const totalSaved = ((totalOriginal - totalCompressed) / totalOriginal * 100).toFixed(1);
+                    
+                    showAlert(`成功上傳並壓縮 ${result.data.length} 個圖片！總共節省 ${totalSaved}% 空間`, 'success');
+                    loadImages();
+                } else {
+                    showAlert('上傳失敗：' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('上傳錯誤：' + error.message, 'error');
+            } finally {
+                toggleUploadLoading(false);
+            }
+        }
+        
+        // 載入圖片列表
+        async function loadImages() {
+            try {
+                const response = await fetch(`${API_BASE}/upload/images`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayImages(result.data);
+                } else {
+                    document.getElementById('imagesList').innerHTML = '<p>載入失敗</p>';
+                }
+            } catch (error) {
+                document.getElementById('imagesList').innerHTML = '<p>載入錯誤</p>';
+            }
+        }
+        
+        // 顯示圖片列表
+        function displayImages(images) {
+            const imagesList = document.getElementById('imagesList');
+            
+            if (images.length === 0) {
+                imagesList.innerHTML = '<p>目前沒有上傳的圖片</p>';
+                return;
+            }
+            
+            imagesList.innerHTML = images.map(image => `
+                <div class="image-card">
+                    <img src="${image.fullUrl}" alt="${image.filename}" class="image-preview" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzljYTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4='">
+                    <div class="image-info">
+                        <div class="image-name">${image.filename}</div>
+                        <div class="image-url">${image.url}</div>
+                        <div class="image-actions">
+                            <button class="btn btn-small btn-secondary" onclick="copyUrl('${image.fullUrl}')">複製連結</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteImage('${image.filename}')">刪除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 複製 URL
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showAlert('連結已複製到剪貼簿！', 'success');
+            }).catch(() => {
+                showAlert('複製失敗', 'error');
+            });
+        }
+        
+        // 刪除圖片
+        async function deleteImage(filename) {
+            if (!confirm('確定要刪除這張圖片嗎？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload/image/${filename}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('圖片已刪除', 'success');
+                    loadImages();
+                } else {
+                    showAlert('刪除失敗：' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('錯誤：' + error.message, 'error');
+            }
+        }
+        
+        // 拖拽上傳
+        const uploadSection = document.getElementById('uploadSection');
+        
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+        
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+        
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            uploadFiles(files);
+        });
+        
+        // 檔案選擇
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            uploadFiles(e.target.files);
+        });
+        
+        // 頁面載入時載入圖片列表
+        document.addEventListener('DOMContentLoaded', () => {
+            loadImages();
+        });
+    </script>
+</body>
+</html>

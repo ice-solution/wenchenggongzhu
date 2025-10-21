@@ -1,0 +1,68 @@
+# 環境變數文件
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Node.js 依賴
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 文檔文件
+*.md
+README.md
+DEPLOYMENT_GUIDE.md
+PRODUCTION_CONFIG.md
+CLOUDFLARE_SETUP.md
+EMAIL_FIX.md
+CODE_REVIEW_REPORT.md
+SMTP_SETUP_GUIDE.md
+QUICK_EMAIL_SETUP.md
+ENTERPRISE_EMAIL_SETUP.md
+STRIPE_SETUP_GUIDE.md
+QUICK_STRIPE_SETUP.md
+CREATE_EVENT_GUIDE.md
+HOMEPAGE_IMPROVEMENTS.md
+IMAGE_COMPRESSION_GUIDE.md
+IMAGE_UPLOAD_GUIDE.md
+OUTLOOK_EMAIL_SETUP.md
+OUTLOOK_EMAIL_SETUP_2024.md
+EMAIL_SOLUTIONS_2024.md
+
+# 測試文件
+test-*.html
+test-*.js
+debug-*.html
+debug-*.js
+setup-*.js
+update-*.js
+replace-*.js
+seed-with-*.js
+
+# 構建輸出
+dist/
+build/
+*.log
+
+# 操作系統文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 臨時文件
+*.tmp
+*.temp

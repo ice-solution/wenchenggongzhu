@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購買記錄管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1f2937;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .header h1 {
+            color: #ef4444;
+            margin: 0 0 1rem 0;
+        }
+        .stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            flex: 1;
+            min-width: 150px;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444;
+        }
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        .filters {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .filter-group label {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .filter-group select,
+        .filter-group input {
+            background: rgba(55, 65, 81, 0.5);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 6px;
+            padding: 0.5rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #9ca3af;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(75, 85, 99, 0.3);
+            color: white;
+        }
+        .purchases-table {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        th {
+            background: rgba(55, 65, 81, 0.5);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        td {
+            color: #d1d5db;
+            font-size: 0.9rem;
+        }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        .status-confirmed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .status-completed {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎫 購買記錄管理</h1>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-purchases">-</div>
+                    <div class="stat-label">總購買記錄</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-purchases">-</div>
+                    <div class="stat-label">待確認</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="confirmed-purchases">-</div>
+                    <div class="stat-label">已確認</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-revenue">-</div>
+                    <div class="stat-label">總收入</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>狀態篩選</label>
+                    <select id="status-filter">
+                        <option value="">全部狀態</option>
+                        <option value="pending">待確認</option>
+                        <option value="confirmed">已確認</option>
+                        <option value="cancelled">已取消</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>活動篩選</label>
+                    <select id="event-filter">
+                        <option value="">全部活動</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>聯絡方式</label>
+                    <select id="contact-filter">
+                        <option value="">全部方式</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="email">電子郵件</option>
+                        <option value="phone">電話</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>搜尋</label>
+                    <input type="text" id="search-input" placeholder="搜尋姓名或電子郵件">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="loadPurchases()">篩選</button>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="clearFilters()">清除</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="purchases-table">
+            <div id="loading" class="loading">載入中...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            <div id="success" class="success" style="display: none;"></div>
+            
+            <table id="purchases-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>購買時間</th>
+                        <th>姓名</th>
+                        <th>電子郵件</th>
+                        <th>聯絡方式</th>
+                        <th>票券</th>
+                        <th>數量</th>
+                        <th>金額</th>
+                        <th>支付方式</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="purchases-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        let allPurchases = [];
+        let allEvents = [];
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadEvents();
+            await loadPurchases();
+        });
+
+        // 載入活動列表
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_BASE}/events`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allEvents = data.data;
+                    const eventFilter = document.getElementById('event-filter');
+                    eventFilter.innerHTML = '<option value="">全部活動</option>';
+                    
+                    allEvents.forEach(event => {
+                        const option = document.createElement('option');
+                        option.value = event._id;
+                        option.textContent = event.title;
+                        eventFilter.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('載入活動列表失敗:', error);
+            }
+        }
+
+        // 載入購買記錄
+        async function loadPurchases() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const success = document.getElementById('success');
+            const table = document.getElementById('purchases-table');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            success.style.display = 'none';
+            table.style.display = 'none';
+
+            try {
+                const params = new URLSearchParams();
+                
+                const statusFilter = document.getElementById('status-filter').value;
+                const eventFilter = document.getElementById('event-filter').value;
+                const contactFilter = document.getElementById('contact-filter').value;
+                const searchInput = document.getElementById('search-input').value;
+                
+                if (statusFilter) params.append('status', statusFilter);
+                if (eventFilter) params.append('eventId', eventFilter);
+                if (contactFilter) params.append('contactMethod', contactFilter);
+                if (searchInput) params.append('email', searchInput);
+
+                const response = await fetch(`${API_BASE}/purchases?${params.toString()}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allPurchases = data.data;
+                    displayPurchases(allPurchases);
+                    updateStats(allPurchases);
+                    
+                    loading.style.display = 'none';
+                    table.style.display = 'table';
+                } else {
+                    throw new Error(data.message || '載入購買記錄失敗');
+                }
+            } catch (error) {
+                console.error('載入購買記錄失敗:', error);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = `載入失敗: ${error.message}`;
+            }
+        }
+
+        // 顯示購買記錄
+        function displayPurchases(purchases) {
+            const tbody = document.getElementById('purchases-tbody');
+            tbody.innerHTML = '';
+
+            purchases.forEach(purchase => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(purchase.createdAt).toLocaleString('zh-TW')}</td>
+                    <td>${purchase.username}</td>
+                    <td>${purchase.email}</td>
+                    <td>${getContactMethodText(purchase.contactMethod)}</td>
+                    <td>${purchase.ticket ? purchase.ticket.name : 'N/A'}</td>
+                    <td>${purchase.quantity}</td>
+                    <td>HK$${purchase.totalPrice || purchase.totalAmount || 0}</td>
+                    <td>
+                        ${purchase.paymentMethod === 'stripe' ? 
+                            '<span style="color: #10b981; font-weight: 600;">Stripe</span>' : 
+                            '<span style="color: #6b7280;">手動</span>'
+                        }
+                    </td>
+                    <td><span class="status-badge status-${purchase.status}">${getStatusText(purchase.status)}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            ${purchase.status === 'pending' ? `
+                                <button class="btn btn-small" onclick="updateStatus('${purchase._id}', 'confirmed')">確認</button>
+                                <button class="btn btn-small btn-secondary" onclick="updateStatus('${purchase._id}', 'cancelled')">取消</button>
+                            ` : ''}
+                            ${purchase.paymentMethod === 'stripe' && purchase.stripePaymentLinkUrl ? `
+                                <button class="btn btn-small btn-secondary" onclick="window.open('${purchase.stripePaymentLinkUrl}', '_blank')">支付連結</button>
+                            ` : ''}
+                            <button class="btn btn-small btn-secondary" onclick="viewDetails('${purchase._id}')">詳情</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 更新統計數據
+        function updateStats(purchases) {
+            const total = purchases.length;
+            const pending = purchases.filter(p => p.status === 'pending').length;
+            const confirmed = purchases.filter(p => p.status === 'confirmed').length;
+            const totalRevenue = purchases
+                .filter(p => p.status === 'confirmed' || p.status === 'completed')
+                .reduce((sum, p) => sum + (p.totalPrice || p.totalAmount || 0), 0);
+
+            document.getElementById('total-purchases').textContent = total;
+            document.getElementById('pending-purchases').textContent = pending;
+            document.getElementById('confirmed-purchases').textContent = confirmed;
+            document.getElementById('total-revenue').textContent = `HK$${totalRevenue}`;
+        }
+
+        // 更新購買狀態
+        async function updateStatus(purchaseId, status) {
+            try {
+                const response = await fetch(`${API_BASE}/purchases/${purchaseId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`購買記錄狀態已更新為: ${getStatusText(status)}`);
+                    await loadPurchases();
+                } else {
+                    throw new Error(data.message || '更新狀態失敗');
+                }
+            } catch (error) {
+                console.error('更新狀態失敗:', error);
+                showError(`更新狀態失敗: ${error.message}`);
+            }
+        }
+
+        // 查看詳情
+        function viewDetails(purchaseId) {
+            const purchase = allPurchases.find(p => p._id === purchaseId);
+            if (purchase) {
+                const details = `
+購買記錄詳情:
+- 姓名: ${purchase.username}
+- 電子郵件: ${purchase.email}
+- 聯絡方式: ${getContactMethodText(purchase.contactMethod)}
+- 聯絡資訊: ${purchase.contactInfo}
+- 票券: ${purchase.ticket ? purchase.ticket.name : 'N/A'}
+- 數量: ${purchase.quantity}
+- 總金額: HK$${purchase.totalPrice || purchase.totalAmount || 0}
+- 狀態: ${getStatusText(purchase.status)}
+- 購買時間: ${new Date(purchase.createdAt).toLocaleString('zh-TW')}
+- 備註: ${purchase.notes || '無'}
+                `;
+                alert(details);
+            }
+        }
+
+        // 清除篩選器
+        function clearFilters() {
+            document.getElementById('status-filter').value = '';
+            document.getElementById('event-filter').value = '';
+            document.getElementById('contact-filter').value = '';
+            document.getElementById('search-input').value = '';
+            loadPurchases();
+        }
+
+        // 顯示成功訊息
+        function showSuccess(message) {
+            const success = document.getElementById('success');
+            success.style.display = 'block';
+            success.textContent = message;
+            setTimeout(() => {
+                success.style.display = 'none';
+            }, 3000);
+        }
+
+        // 顯示錯誤訊息
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.style.display = 'block';
+            error.textContent = message;
+            setTimeout(() => {
+                error.style.display = 'none';
+            }, 5000);
+        }
+
+        // 輔助函數
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待確認',
+                'confirmed': '已確認',
+                'cancelled': '已取消',
+                'completed': '已完成'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getContactMethodText(method) {
+            const methodMap = {
+                'whatsapp': 'WhatsApp',
+                'email': '電子郵件',
+                'phone': '電話'
+            };
+            return methodMap[method] || method;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

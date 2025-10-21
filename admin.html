@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文成公主國際基金會 - 活動管理後台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ef4444;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .events-list {
+            margin-top: 2rem;
+        }
+        
+        .event-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .event-info h3 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .event-info p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>文成公主國際基金會 - 活動管理後台</h1>
+    </div>
+    
+    <div class="container">
+        <!-- 建立活動表單 -->
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; color: #1f2937;">建立新活動</h2>
+            
+            <div id="alert-container"></div>
+            
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="title">活動標題 *</label>
+                    <input type="text" id="title" required placeholder="例如：文成公主文化節 2024">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">活動描述 *</label>
+                    <textarea id="description" required placeholder="詳細描述活動內容、特色等..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shortDescription">簡短描述 *</label>
+                    <textarea id="shortDescription" required placeholder="用於首頁顯示的簡短描述..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">活動海報 *</label>
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <input type="file" id="imageFile" accept="image/*" style="margin-bottom: 0.5rem;">
+                            <button type="button" id="uploadBtn" class="btn btn-small" style="width: auto; margin-bottom: 0.5rem;">上傳圖片</button>
+                            <div id="uploadStatus" style="font-size: 0.875rem; color: #6b7280;"></div>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="url" id="image" placeholder="或輸入圖片 URL" style="margin-bottom: 0.5rem;">
+                            <div id="imagePreview" style="max-width: 200px; max-height: 150px; border: 1px solid #d1d5db; border-radius: 4px; overflow: hidden; display: none;">
+                                <img id="previewImg" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="date">活動日期 *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">活動時間 *</label>
+                        <input type="time" id="time" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="venue">場地 *</label>
+                    <input type="text" id="venue" required placeholder="例如：香港文化中心">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="status">狀態 *</label>
+                        <select id="status" required>
+                            <option value="upcoming">即將開始</option>
+                            <option value="live">進行中</option>
+                            <option value="ended">已完結</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="organizer">主辦機構 *</label>
+                        <input type="text" id="organizer" value="文成公主國際基金會" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="featured"> 設為精選活動
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">建立活動</button>
+            </form>
+        </div>
+        
+        <!-- 載入中 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>處理中...</p>
+        </div>
+        
+        <!-- 現有活動列表 -->
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; color: #1f2937;">現有活動</h2>
+            <div id="eventsList" class="events-list">
+                <p>載入中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        
+        // 檔案上傳功能
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('imageFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('請選擇要上傳的圖片', 'error');
+                return;
+            }
+            
+            // 檢查檔案大小 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('檔案大小不能超過 5MB', 'error');
+                return;
+            }
+            
+            // 檢查檔案類型
+            if (!file.type.startsWith('image/')) {
+                showAlert('請選擇圖片檔案', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadStatus = document.getElementById('uploadStatus');
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '上傳中...';
+            uploadStatus.textContent = '正在上傳...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload/image`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 設定圖片 URL
+                    document.getElementById('image').value = result.data.fullUrl;
+                    showImagePreview(result.data.fullUrl);
+                    
+                    // 顯示壓縮資訊
+                    const compressionInfo = `上傳成功！原始: ${(result.data.originalSize / 1024 / 1024).toFixed(2)}MB, 壓縮後: ${(result.data.compressedSize / 1024 / 1024).toFixed(2)}MB, 節省: ${result.data.compressionRatio}%`;
+                    uploadStatus.textContent = compressionInfo;
+                    uploadStatus.style.color = '#059669';
+                    showAlert('圖片上傳並壓縮成功！', 'success');
+                } else {
+                    uploadStatus.textContent = '上傳失敗：' + result.message;
+                    uploadStatus.style.color = '#dc2626';
+                    showAlert('上傳失敗：' + result.message, 'error');
+                }
+            } catch (error) {
+                uploadStatus.textContent = '上傳錯誤：' + error.message;
+                uploadStatus.style.color = '#dc2626';
+                showAlert('上傳錯誤：' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '上傳圖片';
+            }
+        });
+        
+        // 顯示圖片預覽
+        function showImagePreview(url) {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (url) {
+                previewImg.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        // 監聽 URL 輸入變化
+        document.getElementById('image').addEventListener('input', (e) => {
+            showImagePreview(e.target.value);
+        });
+        
+        // 顯示提示訊息
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alert-container');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            alertContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // 顯示/隱藏載入狀態
+        function toggleLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('submitBtn').disabled = show;
+        }
+        
+        // 建立活動
+        document.getElementById('eventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const eventData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                shortDescription: document.getElementById('shortDescription').value,
+                image: document.getElementById('image').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                venue: document.getElementById('venue').value,
+                status: document.getElementById('status').value,
+                organizer: document.getElementById('organizer').value,
+                featured: document.getElementById('featured').checked
+            };
+            
+            toggleLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/events`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(eventData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('活動建立成功！', 'success');
+                    document.getElementById('eventForm').reset();
+                    document.getElementById('organizer').value = '文成公主國際基金會';
+                    loadEvents();
+                } else {
+                    showAlert('建立失敗：' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('錯誤：' + error.message, 'error');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+        
+        // 載入活動列表
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_BASE}/events`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayEvents(result.data);
+                } else {
+                    document.getElementById('eventsList').innerHTML = '<p>載入失敗</p>';
+                }
+            } catch (error) {
+                document.getElementById('eventsList').innerHTML = '<p>載入錯誤</p>';
+            }
+        }
+        
+        // 顯示活動列表
+        function displayEvents(events) {
+            const eventsList = document.getElementById('eventsList');
+            
+            if (events.length === 0) {
+                eventsList.innerHTML = '<p>目前沒有活動</p>';
+                return;
+            }
+            
+            eventsList.innerHTML = events.map(event => `
+                <div class="event-item">
+                    <div class="event-info">
+                        <h3>${event.title}</h3>
+                        <p>${event.venue} • ${new Date(event.date).toLocaleDateString('zh-TW')} ${event.time}</p>
+                        <p>狀態: ${getStatusText(event.status)}</p>
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-small btn-secondary" onclick="viewEvent('${event._id}')">查看</button>
+                        <button class="btn btn-small btn-secondary" onclick="editEvent('${event._id}')">編輯</button>
+                        <button class="btn btn-small" onclick="deleteEvent('${event._id}')">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 取得狀態文字
+        function getStatusText(status) {
+            const statusMap = {
+                'upcoming': '即將開始',
+                'live': '進行中',
+                'ended': '已完結'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // 查看活動
+        function viewEvent(eventId) {
+            window.open(`http://localhost:5175/?id=${eventId}`, '_blank');
+        }
+        
+        // 編輯活動
+        function editEvent(eventId) {
+            // 這裡可以實作編輯功能
+            alert('編輯功能開發中...');
+        }
+        
+        // 刪除活動
+        async function deleteEvent(eventId) {
+            if (!confirm('確定要刪除這個活動嗎？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/events/${eventId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('活動已刪除', 'success');
+                    loadEvents();
+                } else {
+                    showAlert('刪除失敗：' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('錯誤：' + error.message, 'error');
+            }
+        }
+        
+        // 頁面載入時載入活動列表
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEvents();
+        });
+    </script>
+</body>
+</html>
