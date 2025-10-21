@@ -97,7 +97,7 @@ export class PurchaseFormPage {
                   src="${this.event.image}" 
                   alt="${this.event.title}"
                   class="event-poster"
-                  onerror="this.src='https://via.placeholder.com/400x600/1f2937/ffffff?text=Event+Poster'"
+                  onerror="this.src='https://via.placeholder.com/400x600/000000/ffffff?text=Event+Poster'"
                 />
                 <div class="poster-overlay">
                   <h2 class="event-title">${this.event.title}</h2>
@@ -263,7 +263,7 @@ export class PurchaseFormPage {
 
         body {
           font-family: 'Arial', sans-serif;
-          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+          background: #000000;
           color: white;
           min-height: 100vh;
         }
@@ -661,7 +661,7 @@ export class PurchaseFormPage {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+          background: #000000;
         }
 
         .loading-container {
@@ -882,7 +882,7 @@ export class PurchaseFormPage {
             <div class="success-content">
               <!-- Event Photo -->
               <div class="event-photo-section">
-                <img src="${this.event.image}" alt="${this.event.title}" class="event-photo" onerror="this.src='https://via.placeholder.com/400x600/1f2937/ffffff?text=Event+Poster'"/>
+                <img src="${this.event.image}" alt="${this.event.title}" class="event-photo" onerror="this.src='https://via.placeholder.com/400x600/000000/ffffff?text=Event+Poster'"/>
                 <div class="event-photo-overlay">
                   <h3 class="event-photo-title">${this.event.title}</h3>
                 </div>
@@ -1005,7 +1005,7 @@ export class PurchaseFormPage {
         
         body {
           font-family: Arial, sans-serif;
-          background: #1f2937;
+          background: #000000;
           color: white;
           line-height: 1.6;
         }
@@ -1383,7 +1383,7 @@ export class PurchaseFormPage {
             <div class="error-content">
               <!-- Event Photo -->
               <div class="event-photo-section">
-                <img src="${this.event.image}" alt="${this.event.title}" class="event-photo" onerror="this.src='https://via.placeholder.com/400x600/1f2937/ffffff?text=Event+Poster'"/>
+                <img src="${this.event.image}" alt="${this.event.title}" class="event-photo" onerror="this.src='https://via.placeholder.com/400x600/000000/ffffff?text=Event+Poster'"/>
                 <div class="event-photo-overlay">
                   <h3 class="event-photo-title">${this.event.title}</h3>
                 </div>

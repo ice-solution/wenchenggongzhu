@@ -749,7 +749,7 @@ export class HomePage {
             alt="${event.title}"
             class="event-image"
             data-route="/event?id=${event._id}"
-            onerror="this.src='https://via.placeholder.com/600x400/1f2937/ffffff?text=Event+Image'"
+            onerror="this.src='https://via.placeholder.com/600x400/000000/ffffff?text=Event+Image'"
           />
         </div>
 

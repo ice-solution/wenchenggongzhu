@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            background: #000000;
             color: white;
             min-height: 100vh;
         }
@@ -671,7 +671,7 @@
                 if (purchase.event.image) {
                     document.getElementById('eventPoster').innerHTML = `
                         <img src="${purchase.event.image}" alt="${purchase.event.title}" 
-                             onerror="this.src='https://via.placeholder.com/300x400/1f2937/ffffff?text=Event+Poster'">
+                             onerror="this.src='https://via.placeholder.com/300x400/000000/ffffff?text=Event+Poster'">
                     `;
                 }
             }

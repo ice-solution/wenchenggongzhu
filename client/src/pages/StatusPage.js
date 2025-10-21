@@ -225,7 +225,7 @@ export class StatusPage {
             <div class="event-poster">
               ${purchase.event && purchase.event.image ? `
                 <img src="${purchase.event.image}" alt="${purchase.event.title}" 
-                     onerror="this.src='https://via.placeholder.com/300x400/1f2937/ffffff?text=Event+Poster'">
+                     onerror="this.src='https://via.placeholder.com/300x400/000000/ffffff?text=Event+Poster'">
               ` : ''}
             </div>
 
@@ -378,7 +378,7 @@ export class StatusPage {
         
         body {
           font-family: Arial, sans-serif;
-          background: #1f2937;
+          background: #000000;
           color: white;
           line-height: 1.6;
         }

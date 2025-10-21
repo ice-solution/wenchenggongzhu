@@ -90,7 +90,7 @@ export class EventDetailsPage {
                 src="${this.event.image}"
                 alt="${this.event.title}"
                 class="event-detail-image"
-                onerror="this.src='https://via.placeholder.com/600x800/1f2937/ffffff?text=Event+Image'"
+                onerror="this.src='https://via.placeholder.com/600x800/000000/ffffff?text=Event+Image'"
               />
             </div>
 
@@ -185,7 +185,7 @@ export class EventDetailsPage {
 
         body {
           font-family: 'Arial', sans-serif;
-          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+          background: #000000;
           color: white;
           min-height: 100vh;
         }
@@ -595,7 +595,7 @@ export class EventDetailsPage {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+          background: #000000;
         }
 
         .loading-container {

@@ -75,13 +75,13 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1f2937',
+          backgroundColor: '#000000',
           border: '1px solid #374151',
           borderRadius: 12,
           transition: 'all 0.3s ease',
           '&:hover': {
             borderColor: '#ef4444',
-            backgroundColor: '#111827',
+            backgroundColor: '#000000',
           },
         },
       },

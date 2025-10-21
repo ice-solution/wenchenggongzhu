@@ -87,6 +87,9 @@ const handleWebhook = async (req, res) => {
     const payload = req.body;
     const signature = req.headers['stripe-signature'];
 
+    console.log('Webhook payload type:', typeof payload);
+    console.log('Webhook payload is Buffer:', Buffer.isBuffer(payload));
+
     // 驗證 webhook 簽名
     const verification = stripeService.verifyWebhookSignature(payload, signature);
     

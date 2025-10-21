@@ -21,6 +21,10 @@ connectDB();
 
 // 中介軟體
 app.use(cors());
+
+// Stripe Webhook 路由 (必須在 JSON 解析中介軟體之前)
+app.use('/api/stripe/webhook', express.raw({type: 'application/json'}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
