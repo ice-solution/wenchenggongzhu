@@ -142,7 +142,8 @@ const createPurchase = async (req, res) => {
     await purchase.populate('ticket event');
 
     // 生成專屬 URL（指向前端）
-    const statusUrl = `http://localhost:5174/status/${purchase.uniqueId}`;
+    const frontendUrl = process.env.FRONTEND_URL || `${req.protocol}//${req.get('host')}`;
+    const statusUrl = `${frontendUrl}/status/${purchase.uniqueId}`;
 
     // 創建 Stripe 支付連結
     let stripePaymentLink = null;
@@ -339,12 +340,13 @@ const updatePurchaseStatus = async (req, res) => {
 
     // 發送狀態更新通知郵件 - 已禁用
     // try {
+    //   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5174';
     //   const emailData = {
     //     email: purchase.email,
     //     username: purchase.username,
     //     event: purchase.event,
     //     ticket: purchase.ticket,
-    //     statusUrl: `http://localhost:5174/status/${purchase.uniqueId}`
+    //     statusUrl: `${frontendUrl}/status/${purchase.uniqueId}`
     //   };
     //   
     //   const emailResult = await emailService.sendStatusUpdateNotification(emailData, status);

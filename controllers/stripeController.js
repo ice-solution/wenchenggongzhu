@@ -155,6 +155,7 @@ const handleCheckoutSessionCompleted = async (event) => {
 
     // 發送確認郵件 - 已禁用
     // try {
+    //   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5174';
     //   const emailData = {
     //     email: purchase.email,
     //     username: purchase.username,
@@ -162,7 +163,7 @@ const handleCheckoutSessionCompleted = async (event) => {
     //     ticket: purchase.ticket,
     //     quantity: purchase.quantity,
     //     totalAmount: purchase.totalPrice,
-    //     statusUrl: `${process.env.FRONTEND_URL}/status/${purchase.uniqueId}`
+    //     statusUrl: `${frontendUrl}/status/${purchase.uniqueId}`
     //   };
     //   
     //   await emailService.sendRegistrationConfirmation(emailData);
