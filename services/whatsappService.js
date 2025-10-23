@@ -102,7 +102,7 @@ class WhatsAppService {
 
 📅 *活動資訊*
 • 活動：${event.title}
-• 日期：${new Date(event.date).toLocaleDateString('zh-TW')}
+• 日期：${new Date(event.date).toISOString().split('T')[0]}
 • 時間：${event.time}
 • 地點：${event.venue}
 

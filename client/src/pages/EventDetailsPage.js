@@ -54,11 +54,7 @@ export class EventDetailsPage {
     }
 
     const date = new Date(this.event.date);
-    const formattedDate = date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const formattedDate = date.toISOString().split('T')[0];
 
     return `
       <div class="event-details-page">

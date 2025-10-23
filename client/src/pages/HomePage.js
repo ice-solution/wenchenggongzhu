@@ -548,6 +548,10 @@ export class HomePage {
               min-height: auto;
             }
             
+            .event-card.reverse {
+              flex-direction: column;
+            }
+            
             .event-image-container {
               flex: none;
               height: 300px;
@@ -734,10 +738,7 @@ export class HomePage {
 
   renderEventCard(event, isLeft) {
     const date = new Date(event.date);
-    const formattedDate = date.toLocaleDateString('zh-TW', {
-      month: 'numeric',
-      day: 'numeric'
-    });
+    const formattedDate = date.toISOString().split('T')[0];
     const formattedTime = event.time;
 
     return `

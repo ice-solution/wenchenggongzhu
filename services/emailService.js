@@ -274,7 +274,7 @@ class EmailService {
               </div>
               <div class="info-item">
                 <span class="info-label">活動日期：</span>
-                <span class="info-value">${new Date(event.date).toLocaleDateString('zh-TW')}</span>
+                <span class="info-value">${new Date(event.date).toISOString().split('T')[0]}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">活動時間：</span>
