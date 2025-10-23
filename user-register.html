@@ -265,7 +265,9 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5001/api';
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5001/api' 
+            : '/api';
 
         // 聯絡方式變更事件
         const contactMethodSelect = document.getElementById('contactMethod');
