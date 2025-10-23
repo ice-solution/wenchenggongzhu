@@ -68,7 +68,7 @@ export class PurchaseFormPage {
     }
 
     const basePrice = this.ticket.price;
-    const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+    const additionalAmount = this.additionalAmount ? this.additionalAmount : 0;
     const totalUnitPrice = basePrice + additionalAmount;
     const totalAmount = totalUnitPrice * this.quantity;
 
@@ -196,7 +196,6 @@ export class PurchaseFormPage {
                   </div>
                 </div>
 
-                ${this.ticket.allowCustomPrice ? `
                 <div class="form-group">
                   <label for="additionalAmount">額外捐款金額</label>
                   <input 
@@ -212,7 +211,6 @@ export class PurchaseFormPage {
                     基本票價：HK$${this.ticket.price}，可額外捐款（金額可為0）
                   </div>
                 </div>
-                ` : ''}
 
                 <div class="form-group">
                   <label for="notes">備註</label>
@@ -771,14 +769,12 @@ export class PurchaseFormPage {
     });
 
     // 額外捐款金額變更事件
-    if (this.ticket.allowCustomPrice) {
-      const additionalAmountInput = document.getElementById('additionalAmount');
-      if (additionalAmountInput) {
-        additionalAmountInput.addEventListener('input', (e) => {
-          this.additionalAmount = parseFloat(e.target.value) || 0;
-          this.updatePriceDisplay();
-        });
-      }
+    const additionalAmountInput = document.getElementById('additionalAmount');
+    if (additionalAmountInput) {
+      additionalAmountInput.addEventListener('input', (e) => {
+        this.additionalAmount = parseFloat(e.target.value) || 0;
+        this.updatePriceDisplay();
+      });
     }
 
     // 表單提交事件
@@ -819,7 +815,7 @@ export class PurchaseFormPage {
     if (!this.ticket) return;
     
     const basePrice = this.ticket.price;
-    const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+    const additionalAmount = this.additionalAmount ? this.additionalAmount : 0;
     const totalUnitPrice = basePrice + additionalAmount;
     const totalAmount = totalUnitPrice * this.quantity;
     
@@ -867,12 +863,12 @@ export class PurchaseFormPage {
 
     try {
       const basePrice = this.ticket.price;
-      const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+      const additionalAmount = this.additionalAmount ? this.additionalAmount : 0;
       const totalUnitPrice = basePrice + additionalAmount;
       const totalAmount = totalUnitPrice * this.quantity;
       
       // 如果有額外捐款，顯示確認對話框
-      if (this.ticket.allowCustomPrice && additionalAmount > 0) {
+      if (additionalAmount > 0) {
         const confirmMessage = `確定費用為 HK$${basePrice} 票價 + HK$${additionalAmount} 捐款，總數 HK$${totalAmount}？`;
         const confirmed = confirm(confirmMessage);
         if (!confirmed) {

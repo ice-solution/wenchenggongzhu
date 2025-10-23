@@ -13,7 +13,7 @@ const sampleEvents = [
         "title": "2025 魚類放生活動",
         "description": "由尊貴的夏鉑坦真仁波切帶領，殊勝的魚類放生活動。累積利生福田。為自己和一切眾生持誦放生祈請文。長壽祈福放生儀式。",
         "shortDescription": "由尊貴的夏鉑坦真仁波切帶領，為自己和一切眾生累積利生福田的殊勝魚類放生活動。",
-        "image": "http://localhost:5001/uploads/events/event_1758649407290_304462923.jpg",
+        "image": "/uploads/events/event_1758649407290_304462923.jpg",
         "date": "2025-11-08T00:00:00.000Z",
         "time": "集合: 9:00, 開船: 9:30, 結束: 11:30",
         "venue": "荃灣碼頭 (地鐵荃灣西站旁)",
@@ -27,24 +27,9 @@ const sampleEvents = [
         "title": "道師薈供祈福法會",
         "description": "由尊貴的夏鉑坦真仁波切主法，為大眾舉辦的祈福法會。",
         "shortDescription": "尊貴的夏鉑坦真仁波切主法的道師薈供祈福法會。",
-        "image": "http://localhost:5001/uploads/events/event_1758649915436_4243432.jpg",
+        "image": "/uploads/events/event_1758649915436_4243432.jpg",
         "date": "2025-11-09T00:00:00.000Z",
         "time": "12:00-15:00",
-        "venue": "普賢道場 (灣仔洛克道175-191號京城大廈2樓)",
-        "status": "upcoming",
-        "organizer": "文成公主國際基金會",
-        "featured": false,
-        "price": "388元/人 (附結緣品)",
-        "contact": "姚小姐 WhatsApp +852 9528 8986",
-        "moreInfoLink": "www.wenchenggongzhu.org"
-      },
-      {
-        "title": "蓮師康健長壽富貴灌頂",
-        "description": "由尊貴的夏鉑坦真仁波切主法，蓮師康健長壽富貴灌頂。頂禮蓮師 “心本即遍知，萬法深海藏”。",
-        "shortDescription": "尊貴的夏鉑坦真仁波切主法的蓮師康健長壽富貴灌頂。",
-        "image": "http://localhost:5001/uploads/events/event_1758649917482_456365850.jpg",
-        "date": "2025-11-09T00:00:00.000Z",
-        "time": "16:00-19:00",
         "venue": "普賢道場 (灣仔洛克道175-191號京城大廈2樓)",
         "status": "upcoming",
         "organizer": "文成公主國際基金會",
@@ -93,15 +78,16 @@ const sampleTickets = [
         "isActive": true
       },
       {
-        "name": "蓮師康健長壽富貴灌頂 入場",
-        "description": "由尊貴的夏鉑坦真仁波切主法的蓮師康健長壽富貴灌頂。頂禮蓮師「心本即遍知，萬法深海藏」。入場費用包含結緣品。",
+        "name": "道師薈供祈福法會+蓮師康健長壽富貴灌頂 入場",
+        "description": "由尊貴的夏鉑坦真仁波切主法的道師薈供祈福法會及蓮師康健長壽富貴灌頂。頂禮蓮師「心本即遍知，萬法深海藏」。入場費用包含結緣品。",
         "price": 388,
         "originalPrice": 380,
         "currency": "HKD",
         "type": "standard",
         "restrictions": [
           "每人入場費港幣388元",
-          "入場費用包含結緣品"
+          "入場費用包含結緣品",
+          "包含道師薈供祈福法會及蓮師康健長壽富貴灌頂"
         ],
         "available": 100,
         "total": 100,
@@ -157,10 +143,19 @@ async function seedDatabase() {
     const events = await Event.insertMany(sampleEvents);
     console.log(`已建立 ${events.length} 個活動`);
 
-    // 為每個活動建立票券
+    // 為每個活動建立對應的票券
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
-      const tickets = sampleTickets.map(ticketData => ({
+      let ticketsToCreate = [];
+      
+      // 根據活動標題選擇對應的票券
+      if (event.title === '2025 魚類放生活動') {
+        ticketsToCreate = [sampleTickets[0]]; // 魚類放生活動票券
+      } else if (event.title === '道師薈供祈福法會') {
+        ticketsToCreate = [sampleTickets[1], sampleTickets[2]]; // 道師薈供祈福法會票券 + 道師薈供祈福法會+蓮師康健長壽富貴灌頂票券
+      }
+      
+      const tickets = ticketsToCreate.map(ticketData => ({
         ...ticketData,
         event: event._id
       }));
