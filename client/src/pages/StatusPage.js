@@ -260,9 +260,15 @@ export class StatusPage {
                   <span class="info-value">${purchase.ticket ? purchase.ticket.name : '-'}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">票券價格</span>
+                  <span class="info-label">基本票價</span>
                   <span class="info-value">${purchase.ticket ? `HK$${purchase.ticket.price}/每場` : '-'}</span>
                 </div>
+                ${purchase.additionalAmount > 0 ? `
+                <div class="info-item">
+                  <span class="info-label">額外金額</span>
+                  <span class="info-value">HK$${purchase.additionalAmount}</span>
+                </div>
+                ` : ''}
                 <div class="info-item">
                   <span class="info-label">購買數量</span>
                   <span class="info-value">${purchase.quantity || '-'}</span>

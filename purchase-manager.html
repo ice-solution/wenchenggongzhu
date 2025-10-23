@@ -8,13 +8,14 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: #000000;
             color: white;
         }
         .container {
-            max-width: 1200px;
+            max-width: 95%;
             margin: 0 auto;
+            padding: 0 20px;
         }
         .header {
             background: rgba(55, 65, 81, 0.3);
@@ -108,16 +109,32 @@
             padding: 1.5rem;
             border: 1px solid rgba(75, 85, 99, 0.3);
             overflow-x: auto;
+            min-width: 100%;
         }
         table {
             width: 100%;
+            min-width: 1400px;
             border-collapse: collapse;
         }
         th, td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+            white-space: nowrap;
         }
+        /* 特定欄位寬度設定 */
+        th:nth-child(1), td:nth-child(1) { width: 140px; } /* 購買時間 */
+        th:nth-child(2), td:nth-child(2) { width: 100px; } /* 姓名 */
+        th:nth-child(3), td:nth-child(3) { width: 180px; } /* 電子郵件 */
+        th:nth-child(4), td:nth-child(4) { width: 160px; } /* 聯絡方式 */
+        th:nth-child(5), td:nth-child(5) { width: 200px; white-space: normal; } /* 票券 */
+        th:nth-child(6), td:nth-child(6) { width: 60px; } /* 數量 */
+        th:nth-child(7), td:nth-child(7) { width: 100px; } /* 基本票價 */
+        th:nth-child(8), td:nth-child(8) { width: 100px; } /* 額外金額 */
+        th:nth-child(9), td:nth-child(9) { width: 100px; } /* 總額 */
+        th:nth-child(10), td:nth-child(10) { width: 100px; } /* 支付方式 */
+        th:nth-child(11), td:nth-child(11) { width: 100px; } /* 狀態 */
+        th:nth-child(12), td:nth-child(12) { width: 200px; } /* 操作 */
         th {
             background: rgba(55, 65, 81, 0.5);
             color: white;
@@ -261,7 +278,9 @@
                         <th>聯絡方式</th>
                         <th>票券</th>
                         <th>數量</th>
-                        <th>金額</th>
+                        <th>基本票價</th>
+                        <th>額外金額</th>
+                        <th>總額</th>
                         <th>支付方式</th>
                         <th>狀態</th>
                         <th>操作</th>
@@ -364,9 +383,11 @@
                     <td>${new Date(purchase.createdAt).toLocaleString('zh-TW')}</td>
                     <td>${purchase.username}</td>
                     <td>${purchase.email}</td>
-                    <td>${getContactMethodText(purchase.contactMethod)}</td>
+                    <td>${getContactMethodText(purchase.contactMethod, purchase.contactInfo)}</td>
                     <td>${purchase.ticket ? purchase.ticket.name : 'N/A'}</td>
                     <td>${purchase.quantity}</td>
+                    <td>HK$${purchase.ticket ? purchase.ticket.price : 0}</td>
+                    <td>HK$${purchase.additionalAmount || 0}</td>
                     <td>HK$${purchase.totalPrice || purchase.totalAmount || 0}</td>
                     <td>
                         ${purchase.paymentMethod === 'stripe' ? 
@@ -440,10 +461,11 @@
 購買記錄詳情:
 - 姓名: ${purchase.username}
 - 電子郵件: ${purchase.email}
-- 聯絡方式: ${getContactMethodText(purchase.contactMethod)}
-- 聯絡資訊: ${purchase.contactInfo}
+- 聯絡方式: ${getContactMethodText(purchase.contactMethod, purchase.contactInfo)}
 - 票券: ${purchase.ticket ? purchase.ticket.name : 'N/A'}
 - 數量: ${purchase.quantity}
+- 基本票價: HK$${purchase.ticket ? purchase.ticket.price : 0}
+- 額外金額: HK$${purchase.additionalAmount || 0}
 - 總金額: HK$${purchase.totalPrice || purchase.totalAmount || 0}
 - 狀態: ${getStatusText(purchase.status)}
 - 購買時間: ${new Date(purchase.createdAt).toLocaleString('zh-TW')}
@@ -493,13 +515,20 @@
             return statusMap[status] || status;
         }
 
-        function getContactMethodText(method) {
+        function getContactMethodText(method, contactInfo) {
             const methodMap = {
                 'whatsapp': 'WhatsApp',
                 'email': '電子郵件',
                 'phone': '電話'
             };
-            return methodMap[method] || method;
+            const methodText = methodMap[method] || method;
+            
+            // 如果有聯絡資訊，顯示聯絡方式 + 聯絡資訊
+            if (contactInfo) {
+                return `${methodText}: ${contactInfo}`;
+            }
+            
+            return methodText;
         }
     </script>
 </body>

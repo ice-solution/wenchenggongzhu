@@ -4,6 +4,8 @@ export class PurchaseFormPage {
     this.ticket = null;
     this.event = null;
     this.quantity = 1;
+    this.customPrice = null;
+    this.additionalAmount = 0; // 額外捐款金額
   }
 
   async init() {
@@ -65,7 +67,10 @@ export class PurchaseFormPage {
       `;
     }
 
-    const totalAmount = this.ticket.price * this.quantity;
+    const basePrice = this.ticket.price;
+    const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+    const totalUnitPrice = basePrice + additionalAmount;
+    const totalAmount = totalUnitPrice * this.quantity;
 
     return `
       <div class="purchase-form-page">
@@ -133,7 +138,7 @@ export class PurchaseFormPage {
                   <h3>${this.ticket.name}</h3>
                   <p class="ticket-description">${this.ticket.description}</p>
                   <div class="ticket-meta">
-                    <span class="price">HK$${this.ticket.price}/每場</span>
+                    <span class="price">HK$${totalUnitPrice}/每場</span>
                     <span class="quantity">數量: ${this.quantity}</span>
                     <span class="total">總計: HK$${totalAmount}</span>
                   </div>
@@ -190,6 +195,24 @@ export class PurchaseFormPage {
                     請根據您選擇的聯絡方式輸入相應資訊
                   </div>
                 </div>
+
+                ${this.ticket.allowCustomPrice ? `
+                <div class="form-group">
+                  <label for="additionalAmount">額外捐款金額</label>
+                  <input 
+                    type="number" 
+                    id="additionalAmount" 
+                    name="additionalAmount" 
+                    min="0"
+                    step="1"
+                    value="0"
+                    placeholder="請輸入額外捐款金額"
+                  >
+                  <div class="form-hint">
+                    基本票價：HK$${this.ticket.price}，可額外捐款（金額可為0）
+                  </div>
+                </div>
+                ` : ''}
 
                 <div class="form-group">
                   <label for="notes">備註</label>
@@ -747,6 +770,17 @@ export class PurchaseFormPage {
       contactHint.textContent = this.getContactHint(method);
     });
 
+    // 額外捐款金額變更事件
+    if (this.ticket.allowCustomPrice) {
+      const additionalAmountInput = document.getElementById('additionalAmount');
+      if (additionalAmountInput) {
+        additionalAmountInput.addEventListener('input', (e) => {
+          this.additionalAmount = parseFloat(e.target.value) || 0;
+          this.updatePriceDisplay();
+        });
+      }
+    }
+
     // 表單提交事件
     const form = document.getElementById('purchase-form');
     form.addEventListener('submit', (e) => {
@@ -781,16 +815,73 @@ export class PurchaseFormPage {
     }
   }
 
+  updatePriceDisplay() {
+    if (!this.ticket) return;
+    
+    const basePrice = this.ticket.price;
+    const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+    const totalUnitPrice = basePrice + additionalAmount;
+    const totalAmount = totalUnitPrice * this.quantity;
+    
+    // 更新價格顯示
+    const priceElement = document.querySelector('.price');
+    const totalElement = document.querySelector('.total');
+    
+    if (priceElement) {
+      priceElement.textContent = `HK$${totalUnitPrice}/每場`;
+    }
+    
+    if (totalElement) {
+      totalElement.textContent = `總計: HK$${totalAmount}`;
+    }
+  }
+
   async handleSubmit() {
     const form = document.getElementById('purchase-form');
     const submitBtn = document.getElementById('submit-btn');
     const formData = new FormData(form);
+
+    // 驗證聯絡方式格式
+    const contactMethod = formData.get('contactMethod');
+    const contactInfo = formData.get('contactInfo');
+    
+    if (contactMethod === 'whatsapp') {
+      // WhatsApp 號碼驗證：必須以 + 開頭，後面跟數字
+      const whatsappRegex = /^\+[1-9]\d{1,14}$/;
+      if (!whatsappRegex.test(contactInfo)) {
+        this.showError('WhatsApp 號碼格式不正確，請輸入有效的國際號碼，例如：+85212345678');
+        return;
+      }
+    } else if (contactMethod === 'phone') {
+      // 電話號碼驗證：必須以 + 開頭，後面跟數字
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(contactInfo)) {
+        this.showError('電話號碼格式不正確，請輸入有效的國際號碼，例如：+85212345678');
+        return;
+      }
+    }
 
     // 禁用提交按鈕
     submitBtn.disabled = true;
     submitBtn.textContent = '提交中...';
 
     try {
+      const basePrice = this.ticket.price;
+      const additionalAmount = this.ticket.allowCustomPrice && this.additionalAmount ? this.additionalAmount : 0;
+      const totalUnitPrice = basePrice + additionalAmount;
+      const totalAmount = totalUnitPrice * this.quantity;
+      
+      // 如果有額外捐款，顯示確認對話框
+      if (this.ticket.allowCustomPrice && additionalAmount > 0) {
+        const confirmMessage = `確定費用為 HK$${basePrice} 票價 + HK$${additionalAmount} 捐款，總數 HK$${totalAmount}？`;
+        const confirmed = confirm(confirmMessage);
+        if (!confirmed) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '提交預購申請';
+          return;
+        }
+      }
+      
       const purchaseData = {
         email: formData.get('email'),
         username: formData.get('username'),
@@ -798,6 +889,9 @@ export class PurchaseFormPage {
         contactInfo: formData.get('contactInfo'),
         ticketId: this.ticket._id,
         quantity: this.quantity,
+        unitPrice: totalUnitPrice,
+        totalPrice: totalAmount,
+        additionalAmount: additionalAmount,
         notes: formData.get('notes')
       };
 

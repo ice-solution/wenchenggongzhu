@@ -21,6 +21,17 @@ const ticketSchema = new mongoose.Schema({
   originalPrice: {
     type: Number
   },
+  allowCustomPrice: {
+    type: Boolean,
+    default: false
+  },
+  minPrice: {
+    type: Number,
+    default: 0
+  },
+  maxPrice: {
+    type: Number
+  },
   currency: {
     type: String,
     default: 'HKD'

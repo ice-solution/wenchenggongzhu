@@ -3,6 +3,7 @@ const Ticket = require('../models/Ticket');
 const Event = require('../models/Event');
 const stripeService = require('../services/stripeService');
 const emailService = require('../services/emailService');
+const whatsappService = require('../services/whatsappService');
 
 // 創建 Stripe 支付連結
 const createPaymentLink = async (req, res) => {
@@ -152,23 +153,48 @@ const handleCheckoutSessionCompleted = async (event) => {
     purchase.paymentMethod = 'stripe';
     await purchase.save();
 
-    // 發送確認郵件
-    try {
-      const emailData = {
-        email: purchase.email,
-        username: purchase.username,
-        event: purchase.event,
-        ticket: purchase.ticket,
-        quantity: purchase.quantity,
-        totalAmount: purchase.totalPrice,
-        statusUrl: `${process.env.FRONTEND_URL}/status/${purchase.uniqueId}`
-      };
-      
-      await emailService.sendRegistrationConfirmation(emailData);
-      console.log('支付確認郵件發送成功');
-    } catch (emailError) {
-      console.error('發送確認郵件失敗:', emailError);
-    }
+    // 發送確認郵件 - 已禁用
+    // try {
+    //   const emailData = {
+    //     email: purchase.email,
+    //     username: purchase.username,
+    //     event: purchase.event,
+    //     ticket: purchase.ticket,
+    //     quantity: purchase.quantity,
+    //     totalAmount: purchase.totalPrice,
+    //     statusUrl: `${process.env.FRONTEND_URL}/status/${purchase.uniqueId}`
+    //   };
+    //   
+    //   await emailService.sendRegistrationConfirmation(emailData);
+    //   console.log('✅ 支付確認郵件發送成功');
+    // } catch (emailError) {
+    //   console.error('❌ 發送確認郵件失敗:', emailError);
+    // }
+
+    // 發送 WhatsApp 通知（如果用戶選擇了 WhatsApp） - 已禁用
+    // if (purchase.contactMethod === 'whatsapp' && process.env.WHATSAPP_ENABLED === 'true') {
+    //   try {
+    //     const whatsappData = {
+    //       contactInfo: purchase.contactInfo,
+    //       username: purchase.username,
+    //       event: purchase.event,
+    //       ticket: purchase.ticket,
+    //       totalPrice: purchase.totalPrice
+    //     };
+    //     
+    //     const whatsappResult = await whatsappService.sendPaymentConfirmation(whatsappData);
+    //     
+    //     if (whatsappResult.success) {
+    //       console.log('✅ WhatsApp 付款確認已發送:', whatsappResult.messageId);
+    //     } else {
+    //       console.log('❌ WhatsApp 發送失敗:', whatsappResult.error);
+    //     }
+    //   } catch (whatsappError) {
+    //     console.error('❌ WhatsApp 發送錯誤:', whatsappError);
+    //   }
+    // } else if (purchase.contactMethod === 'whatsapp') {
+    //   console.log('⚠️  WhatsApp 功能已禁用，跳過發送');
+    // }
 
     console.log(`購買記錄 ${purchaseId} 支付成功，狀態已更新為 confirmed`);
 

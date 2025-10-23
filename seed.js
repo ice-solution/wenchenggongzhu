@@ -63,9 +63,11 @@ const sampleTickets = [
         "originalPrice": 500,
         "currency": "HKD",
         "type": "standard",
+        "allowCustomPrice": true,
+        "minPrice": 500,
         "restrictions": [
           "席位有限，請儘早報名",
-          "建議捐款：港幣500元，上不封頂"
+          "最低捐款：港幣500元，可自行填寫更高金額"
         ],
         "available": 500,
         "total": 500,

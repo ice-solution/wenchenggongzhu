@@ -14,6 +14,9 @@ const createPurchase = async (req, res) => {
       contactInfo,
       ticketId,
       quantity = 1,
+      unitPrice,
+      totalPrice,
+      additionalAmount = 0,
       notes
     } = req.body;
 
@@ -82,8 +85,34 @@ const createPurchase = async (req, res) => {
       });
     }
 
-    // 計算總金額
-    const totalPrice = ticket.price * quantity;
+    // 處理價格計算
+    let finalUnitPrice = ticket.price;
+    let finalAdditionalAmount = 0;
+    let finalTotalPrice = ticket.price * quantity;
+    
+    // 如果有額外捐款金額，驗證並使用
+    if (additionalAmount > 0 && ticket.allowCustomPrice) {
+      if (additionalAmount < 0) {
+        return res.status(400).json({
+          success: false,
+          message: '額外捐款金額不能為負數'
+        });
+      }
+      finalAdditionalAmount = additionalAmount;
+      finalUnitPrice = ticket.price + additionalAmount;
+      finalTotalPrice = totalPrice || (finalUnitPrice * quantity);
+    } else if (unitPrice !== undefined && ticket.allowCustomPrice) {
+      // 兼容舊的自定義價格邏輯
+      if (unitPrice < (ticket.minPrice || ticket.price)) {
+        return res.status(400).json({
+          success: false,
+          message: `自定義價格不能低於最低金額 HK$${ticket.minPrice || ticket.price}`
+        });
+      }
+      finalUnitPrice = unitPrice;
+      finalAdditionalAmount = unitPrice - ticket.price;
+      finalTotalPrice = totalPrice || (unitPrice * quantity);
+    }
 
     // 創建購買記錄
     const purchase = new Purchase({
@@ -94,7 +123,9 @@ const createPurchase = async (req, res) => {
       ticket: ticketId,
       event: ticket.event._id,
       quantity,
-      totalPrice,
+      unitPrice: finalUnitPrice,
+      additionalAmount: finalAdditionalAmount,
+      totalPrice: finalTotalPrice,
       currency: ticket.currency || 'HKD',
       notes,
       ipAddress: req.ip || req.connection.remoteAddress,
@@ -155,29 +186,29 @@ const createPurchase = async (req, res) => {
       await purchase.save();
     }
 
-    // 發送確認郵件
-    try {
-      const emailData = {
-        email: purchase.email,
-        username: purchase.username,
-        event: purchase.event,
-        ticket: purchase.ticket,
-        quantity: purchase.quantity,
-        totalAmount: purchase.totalPrice,
-        statusUrl,
-        paymentLinkUrl: stripePaymentLink
-      };
-      
-      const emailResult = await emailService.sendRegistrationConfirmation(emailData);
-      if (emailResult.success) {
-        console.log('Registration confirmation email sent successfully');
-      } else {
-        console.error('Failed to send registration confirmation email:', emailResult.error);
-      }
-    } catch (emailError) {
-      console.error('Email service error:', emailError);
-      // 不影響主要流程，繼續返回成功響應
-    }
+    // 發送確認郵件 - 已禁用
+    // try {
+    //   const emailData = {
+    //     email: purchase.email,
+    //     username: purchase.username,
+    //     event: purchase.event,
+    //     ticket: purchase.ticket,
+    //     quantity: purchase.quantity,
+    //     totalAmount: purchase.totalPrice,
+    //     statusUrl,
+    //     paymentLinkUrl: stripePaymentLink
+    //   };
+    //   
+    //   const emailResult = await emailService.sendRegistrationConfirmation(emailData);
+    //   if (emailResult.success) {
+    //     console.log('Registration confirmation email sent successfully');
+    //   } else {
+    //     console.error('Failed to send registration confirmation email:', emailResult.error);
+    //   }
+    // } catch (emailError) {
+    //   console.error('Email service error:', emailError);
+    //   // 不影響主要流程，繼續返回成功響應
+    // }
 
     res.status(201).json({
       success: true,
@@ -306,26 +337,26 @@ const updatePurchaseStatus = async (req, res) => {
 
     await purchase.populate('ticket event');
 
-    // 發送狀態更新通知郵件
-    try {
-      const emailData = {
-        email: purchase.email,
-        username: purchase.username,
-        event: purchase.event,
-        ticket: purchase.ticket,
-        statusUrl: `http://localhost:5174/status/${purchase.uniqueId}`
-      };
-      
-      const emailResult = await emailService.sendStatusUpdateNotification(emailData, status);
-      if (emailResult.success) {
-        console.log('Status update notification email sent successfully');
-      } else {
-        console.error('Failed to send status update notification email:', emailResult.error);
-      }
-    } catch (emailError) {
-      console.error('Email service error:', emailError);
-      // 不影響主要流程，繼續返回成功響應
-    }
+    // 發送狀態更新通知郵件 - 已禁用
+    // try {
+    //   const emailData = {
+    //     email: purchase.email,
+    //     username: purchase.username,
+    //     event: purchase.event,
+    //     ticket: purchase.ticket,
+    //     statusUrl: `http://localhost:5174/status/${purchase.uniqueId}`
+    //   };
+    //   
+    //   const emailResult = await emailService.sendStatusUpdateNotification(emailData, status);
+    //   if (emailResult.success) {
+    //     console.log('Status update notification email sent successfully');
+    //   } else {
+    //     console.error('Failed to send status update notification email:', emailResult.error);
+    //   }
+    // } catch (emailError) {
+    //   console.error('Email service error:', emailError);
+    //   // 不影響主要流程，繼續返回成功響應
+    // }
 
     res.json({
       success: true,
